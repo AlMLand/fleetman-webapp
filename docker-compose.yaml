@@ -1,0 +1,42 @@
+# javno ukazivaem versiju sintaksisa dlja docker-compose file
+version: "3"
+
+# eto moi container'i, tak kak nuzhno dumat o kazhdom otdelnim container'e kak o otdelnom service
+services:
+   # imja dlja sozdavaemogo container'a
+   fleetman_webapp_from_jar:
+      # image iz kotorogo budet sozdan container plus ego TAG
+      image: feodal1985/fleetman_webapp_from_jar:0.0.1
+      networks:
+         # `-` v `.yaml` oznachaet collection
+         - fleetman_networking
+      ports:
+         # vneschij port -> port cherez kotorij ja mogu zagljanut cherez browser i
+         # vnutrennij port -> port kotorij activen vnutri container'a (v dannom sluchae eto port ot tomcat)
+         -  8080:8080
+      # container sozdaetsja posle sozdanija ukazannogo container'a, chto to vrode porjadka sozdanija
+      depends_on:
+         -  mysql_8
+   # imja dlja sozdavaemogo container'a
+   mysql_8:
+      image: mysql:8.0.30
+      networks:
+         - fleetman_networking
+      # environment peremennie, kotorie neobhodime
+      environment:
+         # passwort dlja default `root` user'a kak = secret
+         - MYSQL_ROOT_PASSWORD=secret
+         # sozdaem bazu dannih s imenem `fleetman`, k nej i budet konektitsja moe web prilozhenie
+         - MYSQL_DATABASE=fleetman
+      # opredeljaju imja (chtobi mozhno bilo legche najti dlja volume)
+      volumes:
+         -  mysql_8-fleetman_webapp_from_jar:/var/lib/mysql
+# sozdaju network
+networks:
+   # imja nowoj seti
+   # wse chto idet posle `:` eto kakie-to osobennie nastrojki dlja network, esli nichego net, to mozhno ostavit pustim
+   fleetman_networking:
+
+# sozdaju volume dlja mysql basi dannih, na nego ona ssilaetsja v configuracii
+volumes:
+   mysql_8-fleetman_webapp_from_jar:

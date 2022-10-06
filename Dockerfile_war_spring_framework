@@ -1,0 +1,26 @@
+# bazivij image, na osnove kotorogo ja stroju svoj image
+FROM tomcat:8.5.82-jdk8
+
+LABEL maintainer = "Alex Morland"
+LABEL email = "morlandalex@goolemail.com"
+LABEL creationdate = "27.09.2022"
+
+# eta comanda pozwoljaet zapustit ljubie linux comandi v containere
+# naprimer dannaja comanda stiraet wse soderzhimoe papki `webapps.dist`
+# rm -> stiraet faili; rm -rf stiraet directorys
+RUN rm -rf /usr/local/tomcat/webapps.dist/*
+
+# comanda kopirovanija prokladivaet put ot meste gde nahoditsja `Dockerfile_war_spring_framework`
+#      eto otkuda copiruju                 eto kuda kopiruju (plus pereimenovivaju war fail v ROOT.war)
+COPY /target/fleetman-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
+
+# argument VM dlja prilozhenija
+ENV JAVA_OPTS="-Dspring.profiles.active=docker-demo"
+
+# predostabljaetsja iskljuchitelno v celjah documentacii, tak kak nasleduetsja iz bazovogo dockerfile
+# goworit chto prolozhenie idet na port 8080
+EXPOSE 8080
+
+# esli ne napisat etu comandu, ona budet nasledovana iz basovogo image
+# t.e. v etom sluchae ot `tomcat:10.1.0-jdk17-temurin-jammy`
+CMD ["catalina.sh", "run"]

@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  fw_app:
+    build:
+      context: imageapp
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - fl_network
+    depends_on:
+      - mysql_8
+  mysql_8:
+    image: mysql:8.0.30
+    ports:
+      - 3306:3306
+    networks:
+      - fl_network
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=fleetman
+    volumes:
+      - fw_db_volume:/var/lib/mysql
+
+networks:
+  fl_network:
+
+volumes:
+  fw_db_volume:
