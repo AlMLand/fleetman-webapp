@@ -17,6 +17,18 @@ services:
       # container sozdaetsja posle sozdanija ukazannogo container'a, chto to vrode porjadka sozdanija
       depends_on:
          -  mysql_8
+      # pri ispolziwanii SWARM (budet proignorirowanno, elsi zapuskaju localno) mozhno srazu v docker-compose faile propisat,
+      # skolko instancew etogo ekzempljara dolzhno zapustitsja v SWARM
+      deploy:
+         replicas: 2
+         # rolling updates, posle izmenenij na image
+         update_config:
+            # skolko obnowljat za odin raz
+            parallelism: 1
+            # podozhdat stolko, prezhde chem sozdat nowir container s update'mi
+            delay: 120s
+         restart_policy:
+            condition: on-failure
    # imja dlja sozdavaemogo container'a
    mysql_8:
       image: mysql:8.0.30
